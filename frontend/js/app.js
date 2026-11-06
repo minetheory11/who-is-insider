@@ -84,18 +84,19 @@ async function setupDiscord() {
     }
 }
 
-// 5. ฟังก์ชันเชื่อมต่อ WebSocket กับ Python Backend
+// 5. ฟังก์ชันเชื่อมต่อ WebSocket กับ Python Backend (อัปเดตเป็น Render SSL WSS)
 function connectWebSocket(userId, username) {
     if (socket && socket.readyState === WebSocket.OPEN) {
         console.log("เชื่อมต่ออยู่แล้ว");
         return;
     }
 
-    const wsUrl = `ws://localhost:8000/ws/${roomId}/${userId}/${encodeURIComponent(username)}`;
+    // ชี้ URL ไปยัง Render Server ที่ปรับใช้ผ่านแล้ว
+    const wsUrl = `wss://who-is-insider.onrender.com/ws/${roomId}/${userId}/${encodeURIComponent(username)}`;
     socket = new WebSocket(wsUrl);
 
     socket.onopen = () => { 
-        console.log("🟢 เชื่อมต่อกับ Backend Server สำเร็จ!"); 
+        console.log("🟢 เชื่อมต่อกับ Backend Server บน Render สำเร็จ!"); 
     };
 
     socket.onmessage = (event) => { 
@@ -105,7 +106,7 @@ function connectWebSocket(userId, username) {
 
     socket.onerror = (error) => {
         console.error("🔴 WebSocket Error:", error);
-        alert("ไม่สามารถเชื่อมต่อ Python Backend (localhost:8000) ได้ อย่าลืมรัน uvicorn ในคอม!");
+        alert("ไม่สามารถเชื่อมต่อ Render Backend Server ได้ กรุณาตรวจสอบสถานะการทำงานบน Render");
     };
 
     socket.onclose = () => { 
