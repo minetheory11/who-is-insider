@@ -72,11 +72,11 @@
         <span>EVERYONE HAS SOMETHING TO HIDE.</span>
     </footer>
 
-    <!-- 1. โหลด Discord Embedded App SDK (อัปเดตเป็น v1.1.0) -->
+    <!-- 1. โหลด Discord Embedded App SDK (v1.1.0) -->
     <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@1.1.0/dist/index.global.js"></script>
 
-    <!-- 2. โหลดไฟล์ app.js (ลบ type="module" ออกเพื่อให้ใช้ window.DiscordSDK ได้) -->
-    <script src="js/app.js"></script>
+    <!-- 2. โหลดไฟล์ app.js + เพิ่ม Version Parameter เพื่อล้างแคช -->
+    <script src="js/app.js?v=1.0.1"></script>
 
 </body>
 </html>

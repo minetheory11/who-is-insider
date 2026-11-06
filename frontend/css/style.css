@@ -1,4 +1,3 @@
-
 /* =================================
    1. กำหนดสีประจำเว็บไซต์
 ================================= */
@@ -13,7 +12,7 @@
 
 
 /* =================================
-   2. ตั้งค่าพื้นฐาน
+   2. ตั้งค่าพื้นฐาน (แก้ไข - เป็น *)
 ================================= */
 
 * {
@@ -117,6 +116,8 @@ button:hover {
 
 .hero-content {
     max-width: 600px;
+    position: relative;
+    z-index: 10; /* เพิ่มเพื่อให้เนื้อหาฝั่งซ้ายอยู่ชั้นบน */
 }
 
 .subtitle {
@@ -149,6 +150,15 @@ button:hover {
     display: flex;
     gap: 15px;
     margin-top: 35px;
+    position: relative;
+    z-index: 20; /* เพิ่มเพื่อให้โซนปุ่มอยู่ชั้นบนสุด */
+}
+
+.hero-buttons button {
+    position: relative;
+    z-index: 30;
+    cursor: pointer !important;
+    pointer-events: auto !important;
 }
 
 #joinRoomBtn {
