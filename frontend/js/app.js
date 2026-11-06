@@ -1,131 +1,172 @@
-// ดึง DiscordSDK จาก CDN script ที่โหลดใน index.html
-const { DiscordSDK } = window.DiscordSDK || {};
-
+// ==========================================
+// 1. ตั้งค่า Discord SDK & ตัวแปรหลัก
+// ==========================================
 const CLIENT_ID = "1568214504951652372";
+const WEBSOCKET_URL = "wss://who-is-insider.onrender.com"; // Backend URL บน Render
+
 let discordSdk = null;
-if (DiscordSDK) {
-    discordSdk = new DiscordSDK(CLIENT_ID);
-}
-
 let socket = null;
-let currentUser = { id: "guest_" + Math.floor(Math.random() * 1000), username: "Guest" };
-const roomId = "default_room";
+let currentUser = {
+  id: "guest_" + Math.floor(Math.random() * 1000),
+  username: "Player"
+};
 
-// 1. เริ่มต้นระบบเมื่อโหลด DOM เสร็จ
-document.addEventListener("DOMContentLoaded", async () => {
-    // ผูก Event ให้ปุ่มบนหน้าเว็บ HTML
-    bindUIEvents();
+// ==========================================
+// 2. ฟังก์ชันเริ่มการทำงาน Discord SDK Handshake
+// ==========================================
+async function initDiscordSDK() {
+  try {
+    if (window.DiscordSDK) {
+      const { DiscordSDK } = window.DiscordSDK;
+      discordSdk = new DiscordSDK(CLIENT_ID);
 
-    // ลองเชื่อมต่อ Discord SDK
-    await setupDiscord();
-});
+      // ส่งสัญญาณ Handshake บอก Discord ให้ปลดล็อก UI iframe
+      await discordSdk.ready();
+      console.log("Discord SDK ready!");
 
-// 2. ฟังก์ชันช่วยเลื่อนหน้าจออัตโนมัติ (Auto-Scroll)
-function scrollToGameZone() {
-    const mainContent = document.querySelector(".hero-content") || document.querySelector("main");
-    if (mainContent) {
-        mainContent.scrollIntoView({ behavior: "smooth", block: "start" });
+      // ขอ Authentication สิทธิ์ยูสเซอร์จาก Discord
+      const auth = await discordSdk.commands.authenticate();
+      if (auth && auth.user) {
+        currentUser.id = auth.user.id;
+        currentUser.username = auth.user.username;
+        console.log(`Logged in as: ${currentUser.username} (${currentUser.id})`);
+      }
+    } else {
+      console.warn("Discord SDK ไม่ได้ถูกโหลด (อาจกำลังทดสอบนอก Discord)");
     }
+  } catch (error) {
+    console.error("Discord SDK Initialization Error:", error);
+  }
 }
 
-// 3. ฟังก์ชันผูกปุ่มกดบนหน้าเว็บ
-function bindUIEvents() {
-    const createBtn = document.getElementById("createRoomBtn");
-    const joinBtn = document.getElementById("joinRoomBtn");
+// ==========================================
+// 3. ฟังก์ชันเชื่อมต่อ WebSocket กับ Render Backend
+// ==========================================
+function connectwebsocket(userid, username) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    console.log("WebSocket connected already.");
+    return;
+  }
 
-    if (createBtn) {
-        createBtn.addEventListener("click", () => {
-            scrollToGameZone();
-            alert(`สร้างห้องสำเร็จ! รหัสห้อง: ${roomId}`);
-            connectWebSocket(currentUser.id, currentUser.username);
-        });
-    }
+  console.log(`Connecting to WebSocket: ${WEBSOCKET_URL}...`);
+  socket = new WebSocket(WEBSOCKET_URL);
 
-    if (joinBtn) {
-        joinBtn.addEventListener("click", () => {
-            scrollToGameZone();
-            alert(`เข้าร่วมห้อง ${roomId}`);
-            connectWebSocket(currentUser.id, currentUser.username);
-        });
-    }
-}
+  socket.onopen = () => {
+    console.log("WebSocket Connection Established!");
+    // ส่งข้อมูลลงทะเบียนผู้ใช้เข้า Server
+    socket.send(JSON.stringify({
+      type: "register",
+      user_id: userid,
+      username: username
+    }));
+  };
 
-// 4. ฟังก์ชันเริ่มต้นใช้งาน Discord SDK
-async function setupDiscord() {
-    if (!discordSdk) {
-        console.warn("ไม่ได้เปิดใน Discord หรือโหลด SDK ไม่สำเร็จ (รันโหมด Web Fallback)");
-        return;
-    }
-
+  socket.onmessage = (event) => {
     try {
-        await discordSdk.ready();
-
-        const { code } = await discordSdk.commands.authorize({
-            client_id: CLIENT_ID,
-            response_type: "code",
-            state: "",
-            prompt: "none",
-            scope: ["identify", "guilds"],
-        });
-
-        const auth = await discordSdk.commands.authenticate({ code });
-        currentUser = auth.user;
-
-        console.log(`เข้าร่วมเกมโดย: ${currentUser.username} (ID: ${currentUser.id})`);
-        
-        // เมื่อยืนยันตัวตนใน Discord ผ่าน ให้เลื่อนหน้าจอลงมาที่เกมอัตโนมัติ
-        scrollToGameZone();
-
-        // เชื่อมต่อ Backend ทันทีเมื่อยืนยันตัวตนสำเร็จ
-        connectWebSocket(currentUser.id, currentUser.username);
-
-    } catch (error) {
-        console.error("การเชื่อมต่อ Discord SDK ขัดข้อง (จะใช้โหมด Guest แทน):", error);
+      const data = JSON.parse(event.data);
+      handleServerMessage(data);
+    } catch (err) {
+      console.error("Error parsing WebSocket message:", err);
     }
+  };
+
+  socket.onerror = (error) => {
+    console.error("WebSocket Error:", error);
+  };
+
+  socket.onclose = () => {
+    console.log("WebSocket Disconnected. Reconnecting in 3 seconds...");
+    setTimeout(() => connectwebsocket(userid, username), 3000);
+  };
 }
 
-// 5. ฟังก์ชันเชื่อมต่อ WebSocket กับ Python Backend (อัปเดตเป็น Render SSL WSS)
-function connectWebSocket(userId, username) {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        console.log("เชื่อมต่ออยู่แล้ว");
-        return;
-    }
-
-    // ชี้ URL ไปยัง Render Server ที่ปรับใช้ผ่านแล้ว
-    const wsUrl = `wss://who-is-insider.onrender.com/ws/${roomId}/${userId}/${encodeURIComponent(username)}`;
-    socket = new WebSocket(wsUrl);
-
-    socket.onopen = () => { 
-        console.log("🟢 เชื่อมต่อกับ Backend Server บน Render สำเร็จ!"); 
-    };
-
-    socket.onmessage = (event) => { 
-        const data = JSON.parse(event.data); 
-        handleServerMessage(data); 
-    };
-
-    socket.onerror = (error) => {
-        console.error("🔴 WebSocket Error:", error);
-        alert("ไม่สามารถเชื่อมต่อ Render Backend Server ได้ กรุณาตรวจสอบสถานะการทำงานบน Render");
-    };
-
-    socket.onclose = () => { 
-        console.log("⚪ หลุดจากการเชื่อมต่อกับ Server"); 
-    };
-}
-
-// 6. จัดการข้อความที่ตอบกลับมาจาก Python Backend
+// ==========================================
+// 4. จัดการข้อความตอบกลับจาก Backend
+// ==========================================
 function handleServerMessage(data) {
-    switch (data.type) {
-        case "game_started":
-            scrollToGameZone();
-            alert(`🎮 เกมเริ่มแล้ว! บทบาทของคุณคือ: ${data.role}`);
-            if (data.secret_word) {
-                alert(`🎯 คำเฉลยของคุณคือ: ${data.secret_word}`);
-            }
-            break;
-        case "turn_update":
-            console.log(`ถึงตาของ: ${data.current_player}`);
-            break;
-    }
+  console.log("Server Message Received:", data);
+
+  switch (data.type) {
+    case "game_started":
+      if (typeof scrollToGameZone === "function") {
+        scrollToGameZone();
+      }
+      alert(`เกมเริ่มแล้ว! บทบาทของคุณคือ: ${data.role}`);
+      if (data.secret_word) {
+        alert(`คำเฉลยของคุณคือ: ${data.secret_word}`);
+      }
+      break;
+
+    case "turn_update":
+      console.log(`ถึงตาของ: ${data.current_player}`);
+      break;
+
+    case "room_created":
+      alert(`สร้างห้องสำเร็จ! รหัสห้อง: ${data.room_code}`);
+      break;
+
+    case "room_joined":
+      alert(`เข้าร่วมห้อง ${data.room_code} สำเร็จ!`);
+      break;
+
+    case "error":
+      alert(`เกิดข้อผิดพลาด: ${data.message}`);
+      break;
+
+    default:
+      console.log("Unhandled message type:", data.type);
+      break;
+  }
 }
+
+// ==========================================
+// 5. ผูกปุ่มกดเมื่อ DOM โหลดเสร็จสิ้น
+// ==========================================
+document.addEventListener("DOMContentLoaded", async () => {
+  // รัน Discord SDK ปลดล็อกหน้าจอ
+  await initDiscordSDK();
+
+  // ดึง Element ปุ่มกดบน UI
+  const createRoomBtn = document.getElementById("createRoomBtn");
+  const joinRoomBtn = document.getElementById("joinRoomBtn");
+  const loginBtn = document.getElementById("loginBtn");
+
+  if (createRoomBtn) {
+    createRoomBtn.addEventListener("click", () => {
+      connectwebsocket(currentUser.id, currentUser.username);
+      // ส่งคำสั่งสร้างห้อง
+      setTimeout(() => {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({
+            type: "create_room",
+            user_id: currentUser.id
+          }));
+        }
+      }, 500);
+    });
+  }
+
+  if (joinRoomBtn) {
+    joinRoomBtn.addEventListener("click", () => {
+      const roomCode = prompt("กรุณากรอกรหัสห้อง (Room Code):");
+      if (roomCode) {
+        connectwebsocket(currentUser.id, currentUser.username);
+        setTimeout(() => {
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({
+              type: "join_room",
+              room_code: roomCode,
+              user_id: currentUser.id
+            }));
+          }
+        }, 500);
+      }
+    });
+  }
+
+  if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+      alert(`ล็อกอินในชื่อ: ${currentUser.username} (${currentUser.id})`);
+    });
+  }
+});
