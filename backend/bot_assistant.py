@@ -1,41 +1,54 @@
-import os
-import discord
-from discord.ext import commands
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-intents = discord.Intents.default()
-bot = commands.Bot(command_prefix="!", intents=intents)
+try:
+    import discord
+    from discord.ext import commands
+    intents = discord.Intents.default()
+    bot = commands.Bot(command_prefix="!", intents=intents)
+    bot.available = True
+except ImportError:
+    discord = None
+
+    class _UnavailableBot:
+        loop = None
+        available = False
+
+        def run(self, token):
+            raise RuntimeError("discord.py is not installed")
+
+    bot = _UnavailableBot()
+
 
 async def send_hint_to_gm(gm_discord_id: int, secret_word: str, hint_info: str):
-    """ส่งข้อมูลคำใบ้ให้ Game Master ช่วยในการตอบคำถาม"""
+    """Send the private answer and context to the Game Master via Discord DM."""
+    if discord is None:
+        print("discord.py is not installed; skipped GM DM.")
+        return
     try:
-        # แปลง ID เป็น integer เพื่อป้องกันกรณีส่ง string เข้ามา
-        user_id = int(gm_discord_id)
-        gm_user = await bot.fetch_user(user_id)
-        
-        if gm_user:
-            embed = discord.Embed(
-                title="👑 ข้อมูลสำหรับผู้ดำเนินเกม (Game Master)",
-                description=f"🎯 **คำเฉลย:** {secret_word}",
-                color=0xC5A45B
-            )
-            embed.add_field(
-                name="💡 ข้อมูลบริบทสำหรับช่วยตอบผู้เล่น", 
-                value=hint_info if hint_info else "ไม่มีข้อมูลบริบทเพิ่มเติม", 
-                inline=False
-            )
-            embed.set_footer(text="ใช้ข้อมูลนี้ประกอบการตอบผู้เล่น: ใช่ / ไม่ใช่ / อาจจะ")
-            
-            # ส่งเป็น Embed ข้อความส่วนตัว (DM)
-            await gm_user.send(embed=embed)
-            print(f"✅ ส่งคำใบ้ให้ GM ({gm_user.name}) เรียบร้อยแล้ว")
+        gm_user = await bot.fetch_user(int(gm_discord_id))
+        embed = discord.Embed(
+            title="ข้อมูลลับสำหรับ Game Master",
+            description=f"คำเฉลย: **{secret_word}**",
+            color=0xC5A45B,
+        )
+        embed.add_field(
+            name="ข้อมูลบริบท",
+            value=(hint_info or "ไม่มีข้อมูลบริบทเพิ่มเติม")[:1024],
+            inline=False,
+        )
+        embed.set_footer(text="ใช้ข้อมูลนี้ประกอบการตอบ: ใช่ / ไม่ใช่ / อาจจะ")
+        await gm_user.send(embed=embed)
+        print(f"Sent private game hint to GM {gm_user.id}")
     except discord.Forbidden:
-        print(f"❌ ไม่สามารถส่ง DM หา GM (ID: {gm_discord_id}) ได้ เนื่องจากผู้ใช้ปิดรับ DM จากคนแปลกหน้า")
-    except Exception as e:
-        print(f"❌ เกิดข้อผิดพลาดในการส่ง DM หา GM: {e}")
+        print(f"Cannot DM GM {gm_discord_id}; the user may have DMs disabled.")
+    except Exception as exc:
+        print(f"Failed to send GM hint: {exc}")
 
-@bot.event
-async def on_ready():
-    print(f"🤖 Bot Assistant Online as {bot.user}")
+
+if discord is not None:
+    @bot.event
+    async def on_ready():
+        print(f"Discord Bot Assistant online as {bot.user}")

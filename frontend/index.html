@@ -1,52 +1,120 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Manipulator</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101a2b">
+  <title>The Manipulator — The Art of Deception</title>
+  <link rel="stylesheet" href="/css/style.css?v=2.2.0">
 </head>
 <body>
+  <header class="navbar">
+    <a class="brand" href="#home" id="brandHome"><span class="brand-mark">T</span><span>THE MANIPULATOR<small>THE ART OF DECEPTION</small></span></a>
+    <nav class="nav-links">
+      <a href="#home" data-nav="home">หน้าแรก</a>
+      <a href="#rules" data-nav="rules">กติกา</a>
+      <a href="#about" data-nav="about">เกี่ยวกับเกม</a>
+    </nav>
+    <div class="connection"><i id="connectionDot"></i><span id="connectionText">กำลังเชื่อมต่อ</span></div>
+  </header>
 
-    <!-- ส่วนหัวเว็บไซต์ -->
-    <header class="navbar">
-        <div class="logo">
-            THE MANIPULATOR
+  <main>
+    <section id="homeScreen" class="screen active">
+      <div class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">CLASSIFIED CASE FILE · NO. 001</p>
+          <h1>ทุกคำตอบ<br><em>มีคนชักใย</em></h1>
+          <p class="hero-description">ตั้งคำถาม ไล่เรียงเบาะแส และค้นหาคนที่กำลังบิดเบือนความจริง<br>แต่ระวังไว้ — คนที่รู้คำตอบ อาจไม่ใช่คนที่คุณคิด</p>
+          <div class="name-entry">
+            <label for="playerNameInput">ชื่อที่ใช้ในการเล่น</label>
+            <input id="playerNameInput" maxlength="24" autocomplete="nickname" placeholder="กรอกชื่อผู้เล่น">
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-gold btn-large" id="createRoomBtn">＋ สร้างห้องเกม</button>
+            <button class="btn btn-outline btn-large" id="openJoinBtn">เข้าร่วมห้อง</button>
+          </div>
+          <p class="micro-note">ต้องมีผู้เล่นอย่างน้อย 3 คน · รองรับสูงสุด 12 คน</p>
         </div>
+        <div class="hero-art">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+          <div class="case-file">
+            <div class="file-top"><span>CONFIDENTIAL</span><span>TM / 001</span></div>
+            <div class="file-symbol">?</div>
+            <div class="file-title">THE UNKNOWN</div>
+            <div class="file-line"></div>
+            <div class="file-meta"><span>STATUS</span><strong>UNRESOLVED</strong></div>
+            <div class="file-stamp">CLASSIFIED</div>
+          </div>
+          <div class="floating-note note-a">WHO KNOWS THE TRUTH?</div>
+          <div class="floating-note note-b">TRUST NO ONE</div>
+        </div>
+      </div>
+      <section id="rules" class="rules-section">
+        <div class="section-heading"><p class="eyebrow">HOW TO PLAY</p><h2>กติกา <em>การเล่น</em></h2><p>เกมสืบสวนที่ทุกคนมีหน้าที่ต่างกัน และมีเพียงคนเดียวที่รู้ว่าความจริงคืออะไร</p></div>
+        <div class="role-grid">
+          <article class="role-card"><span class="role-number">01 / ROLE</span><div class="role-icon">◉</div><h3>ผู้เล่นทั่วไป</h3><p>ร่วมกันถามคำถาม GM เพื่อหาคำเฉลย ใช้ข้อมูลจากคำตอบและประวัติการถามเพื่อจับพิรุธ</p></article>
+          <article class="role-card role-highlight"><span class="role-number">02 / ROLE</span><div class="role-icon">◆</div><h3>ผู้บงการ</h3><p>รู้คำเฉลยตั้งแต่เริ่มเกม แต่ต้องแสร้งทำเป็นไม่รู้และกลมกลืนกับกลุ่ม</p></article>
+          <article class="role-card"><span class="role-number">03 / ROLE</span><div class="role-icon">▣</div><h3>ผู้ดำเนินเกม (GM)</h3><p>เป็นมนุษย์ผู้ถือคำเฉลย ตอบคำถามด้วย “ใช่ / ไม่ใช่ / อาจจะ” และตัดสินว่าคำเดาถูกหรือไม่</p></article>
+        </div>
+        <div class="rules-flow">
+          <div><b>01</b><span>เริ่มเกม</span><p>ระบบสุ่มบทบาทและส่งข้อมูลลับให้ GM กับผู้บงการ โดยผู้เล่นทั่วไปจะไม่เห็นคำเฉลย</p></div>
+          <div><b>02</b><span>ถามและตอบ</span><p>ผู้เล่นผลัดกันถาม GM คนละ 30 วินาที GM เป็นผู้ตัดสินคำตอบเอง</p></div>
+          <div><b>03</b><span>เดาคำเฉลย</span><p>เมื่อถึงเทิร์น ผู้เล่นสามารถส่งคำเดาให้ GM ตรวจสอบได้</p></div>
+          <div><b>04</b><span>ลงคะแนน</span><p>เมื่อมีคนเดาถูก ทุกคนยกเว้น GM โหวตหาผู้บงการ</p></div>
+        </div>
+        <div class="rule-note"><strong>เงื่อนไขการชนะ</strong><span>ฝ่ายผู้เล่นชนะเมื่อ Runoff หรือการโหวตระบุผู้บงการได้ถูกต้องเพียงคนเดียว หากคะแนนสูงสุดเสมอ ระบบจะเปิด Runoff รอบละ 60 วินาทีจนกว่าจะได้ผู้ชนะ</span></div>
+      </section>
+      <section id="about" class="about-section"><p class="eyebrow">ABOUT THE CASE</p><h2>ความจริงไม่ได้อยู่<br>ในสิ่งที่คุณเห็น</h2><p>THE MANIPULATOR คือเกมปาร์ตี้แนวสืบสวนและจิตวิทยา ที่ทดสอบทั้งการตั้งคำถาม การอ่านสถานการณ์ และการสังเกตคนรอบตัว</p></section>
+    </section>
 
-        <nav>
-            <a href="#">หน้าแรก</a>
-            <a href="#">วิธีเล่น</a>
-            <a href="#">เกี่ยวกับเกม</a>
-        </nav>
+    <section id="lobbyScreen" class="screen app-screen">
+      <div class="screen-heading"><div><p class="eyebrow">CASE ROOM · WAITING AREA</p><h1>ห้องรอผู้เล่น</h1><p>ตรวจสอบรายชื่อก่อนเปิดคดี</p></div><button class="btn btn-ghost" data-open-help>วิธีการเล่น ?</button></div>
+      <article id="joinGate" class="panel join-gate hidden">
+        <p class="panel-label">JOIN AN EXISTING ROOM</p><h2>เข้าร่วมห้องเกม</h2><p class="muted">กรอกรหัสห้อง 6 ตัวที่ได้รับจากเจ้าของห้อง</p>
+        <div class="join-row"><input id="roomCodeInput" maxlength="6" autocomplete="off" placeholder="เช่น A1B2C3"><button class="btn btn-gold" id="joinRoomBtn">เข้าห้อง</button></div>
+        <button class="btn btn-ghost" id="cancelJoinBtn">กลับหน้าแรก</button>
+      </article>
+      <div id="lobbyContent" class="lobby-layout hidden">
+        <article class="panel room-panel">
+          <p class="panel-label">ROOM IDENTIFICATION</p><div class="room-code-line"><strong id="lobbyRoomCode">------</strong><button class="icon-btn" id="copyRoomBtn" title="คัดลอกรหัส">▢</button></div>
+          <p class="muted">แชร์รหัสนี้ให้ผู้เล่นที่ต้องการเชิญเข้าห้อง</p>
+          <div class="panel-divider"></div>
+          <div class="player-heading"><h2>ผู้เล่นในห้อง</h2><span id="playerCount">0 / 12</span></div>
+          <div id="lobbyPlayers" class="player-list"></div>
+          <div class="lobby-actions"><button class="btn btn-ghost" id="leaveRoomBtn">ออกจากห้อง</button><button class="btn btn-gold" id="startGameBtn" disabled>เริ่มเกม <span>→</span></button></div>
+          <p id="startHint" class="micro-note">ต้องมีผู้เล่นอย่างน้อย 3 คน และเจ้าของห้องเท่านั้นที่เริ่มเกมได้</p>
+        </article>
+        <aside class="panel lobby-side"><div class="side-emblem">?</div><p class="eyebrow">BEFORE THE GAME</p><h3>ทุกคนมีความลับ</h3><p>บทบาทจะถูกสุ่มเมื่อเจ้าของห้องกดเริ่มเกม อย่าเปิดเผยข้อมูลส่วนตัวที่ระบบส่งให้คุณ</p><div class="side-fact"><span>MIN PLAYERS</span><b>03</b></div><div class="side-fact"><span>MAX PLAYERS</span><b>12</b></div><div class="side-fact"><span>TURN TIME</span><b>30 SEC</b></div></aside>
+      </div>
+    </section>
 
-        <button id="loginBtn">
-            เข้าสู่ระบบ
-        </button>
-    </header>
+    <section id="gameScreen" class="screen app-screen">
+      <div class="screen-heading"><div><p class="eyebrow">CASE IN PROGRESS · <span id="gameRoomCode">------</span></p><h1 id="gamePhaseTitle">กำลังสืบสวน</h1><p id="gamePhaseSubtitle">รวบรวมข้อมูลและจับพิรุธจากคำตอบ</p></div><button class="btn btn-ghost" data-open-help>วิธีการเล่น ?</button></div>
+      <div class="game-layout">
+        <div class="game-main">
+          <article class="panel role-banner"><div><p class="panel-label">YOUR ASSIGNED ROLE</p><h2 id="myRoleTitle">กำลังโหลดบทบาท</h2><p id="myRoleDescription">ข้อมูลบทบาทของคุณจะแสดงที่นี่</p></div><div id="secretBox" class="secret-box hidden"><span>ข้อมูลลับสำหรับ GM และผู้บงการ</span><strong id="secretWord">—</strong><small id="secretInfo"></small><small id="secretMeta" class="secret-meta"></small><a id="secretImageLink" class="hidden" target="_blank" rel="noopener noreferrer"><img id="secretImage" class="secret-image" alt="ภาพประกอบคำเฉลย"></a><small id="secretImageCredit" class="image-credit"></small></div></article>
+          <article class="panel turn-panel"><div class="turn-info"><div><p class="panel-label">CURRENT TURN</p><h2 id="currentTurnName">—</h2></div><div class="turn-clock"><strong id="turnClock">30</strong><span>SEC / TURN</span></div></div><div id="turnNotice" class="turn-notice">กำลังรอข้อมูลเทิร์น...</div>
+            <div id="questionControls" class="controls-block hidden"><label for="questionInput">ถามคำถาม GM</label><div class="input-action"><input id="questionInput" maxlength="300" placeholder="พิมพ์คำถามที่ต้องการถาม..."><button class="btn btn-gold" id="sendQuestionBtn">ส่งคำถาม</button></div><label for="guessInput" class="second-label">หรือส่งคำเดา</label><div class="input-action"><input id="guessInput" maxlength="100" placeholder="คุณคิดว่าคำเฉลยคืออะไร?"><button class="btn btn-outline" id="sendGuessBtn">ส่งคำเดา</button></div></div>
+            <div id="gmControls" class="controls-block hidden"><div class="gm-question"><span>คำถามจากผู้เล่น</span><strong id="incomingQuestion">ยังไม่มีคำถาม</strong></div><p class="control-label">เลือกคำตอบของคุณ</p><div class="answer-buttons"><button class="btn btn-answer" data-answer="ใช่">ใช่</button><button class="btn btn-answer" data-answer="ไม่ใช่">ไม่ใช่</button><button class="btn btn-answer" data-answer="อาจจะ">อาจจะ</button></div><div id="guessReview" class="guess-review hidden"><p>คำเดาที่รอการตรวจสอบ</p><strong id="incomingGuess">—</strong><div><button class="btn btn-outline" id="guessWrongBtn">ยังไม่ถูก</button><button class="btn btn-gold" id="guessCorrectBtn">เดาถูก</button></div></div></div>
+          </article>
+          <article id="votingPanel" class="panel hidden"><div class="vote-head"><div><p class="panel-label">FINAL DECISION</p><h2>ใครคือผู้บงการ?</h2></div><div class="vote-clock"><strong id="voteClock">60</strong><span>วินาที</span></div></div><p class="muted">เลือกผู้เล่นที่คุณสงสัย ทุกคนยกเว้น GM ลงคะแนนได้หนึ่งครั้ง คะแนนจะแสดงให้ทุกคนเห็น</p><div id="voteOptions" class="vote-options"></div><div class="vote-results"><div class="player-heading"><h3>คะแนนโหวต</h3><span id="voteProgress">0 / 0</span></div><div id="voteBars"></div></div><p id="voteStatus" class="micro-note"></p></article>
+          <article id="resultPanel" class="panel result-panel hidden" role="dialog" aria-modal="true" aria-labelledby="resultTitle"><p class="panel-label">CASE CLOSED · OFFICIAL RESULT</p><h2 id="resultTitle">ผลการตัดสิน</h2><p id="resultDescription"></p><div id="finalVoteResults" class="final-vote-results"></div><div class="result-actions"><button class="btn btn-ghost" id="backHomeBtn">กลับหน้าแรก</button><button class="btn btn-gold" id="returnLobbyBtn">กลับ Lobby / เริ่มรอบใหม่</button></div></article>
+          <article class="panel history-panel"><div class="player-heading"><h2>บันทึกการสืบสวน</h2><span>PUBLIC LOG</span></div><div id="gameHistory" class="history-list"><p class="empty-state">ยังไม่มีประวัติการถามตอบ</p></div></article>
+        </div>
+        <aside class="panel game-sidebar"><p class="panel-label">CASE PARTICIPANTS</p><div id="gamePlayers" class="player-list compact"></div><div class="panel-divider"></div><p class="panel-label">GAME RULE</p><p class="sidebar-rule">ถาม GM ได้ทีละคนตามลำดับเทิร์น คำตอบและประวัติเป็นข้อมูลสาธารณะ ส่วนคำเฉลยเป็นข้อมูลลับ</p></aside>
+      </div>
+    </section>
+  </main>
 
-    <!-- เนื้อหาหลัก -->
-    <main class="hero">
-
-        <section class="hero-content">
-
-            <p class="subtitle">
-                THE ART OF DECEPTION
-            </p>
-
-            <h1>
-                จงตามหาคำตอบให้เจอ<br>
-                และอย่าลืมว่ามีใครบางคนคอยชักจูงพวกคุณอยู่
-            </h1>
-
-            <p class="description">
-                ร่วมไขปริศนา ค้นหาคำตอบ
-                และตามหาผู้บงการที่ซ่อนตัวอยู่ในกลุ่มของพวกคุณ
-            </p>
-
-            <div class="hero-buttons">
-                <button id="createRoomBtn">
-                    สร้างห้องเกม
-                </button>
-
-                <button id
+  <footer><span>THE MANIPULATOR © 2026</span><span>EVERYONE HAS SOMETHING TO HIDE.</span></footer>
+  <div id="helpModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="help-modal panel"><div class="modal-heading"><div><p class="panel-label">FIELD MANUAL</p><h2 id="helpTitle">วิธีการเล่น</h2></div><button class="icon-btn" id="closeHelpBtn" aria-label="ปิด">✕</button></div>
+      <div class="help-content"><section><h3>บทบาททั้ง 3 แบบ</h3><p><b>ผู้เล่นทั่วไป:</b> ร่วมกันตั้งคำถามและเดาคำเฉลย ก่อนโหวตหาผู้บงการ</p><p><b>ผู้บงการ:</b> ไม่เห็นคำเฉลย ต้องวิเคราะห์คำตอบ GM และกลมกลืนกับกลุ่ม</p><p><b>GM:</b> เห็นคำเฉลยและข้อมูลประกอบ ตอบคำถามว่า ใช่ / ไม่ใช่ / อาจจะ และตรวจคำเดา</p></section>
+      <section><h3>ลำดับการเล่น</h3><ol><li>เจ้าของห้องเริ่มเกมเมื่อมีผู้เล่นอย่างน้อย 3 คน</li><li>ผู้เล่นและผู้บงการผลัดกันถามคนละ 30 วินาที</li><li>GM ตอบคำถาม และผู้เล่นใช้ประวัติช่วยวิเคราะห์</li><li>เมื่อมีคนเดาคำถูก จะเริ่มโหวตหาผู้บงการ</li><li>ทุกคนยกเว้น GM มีเวลาโหวต 60 วินาที และห้ามโหวตตัวเอง</li><li>หากคะแนนสูงสุดเสมอ จะเปิด Runoff เฉพาะผู้ที่คะแนนเสมอกัน รอบละ 60 วินาที</li><li>ระบบประกาศผล คะแนน และตัวผู้บงการ จากนั้นกลับ Lobby เพื่อเริ่มรอบใหม่</li></ol></section>
+      <p class="help-note">เครื่องหมายในประวัติ: ✓ ใช่ · ✕ ไม่ใช่ · ? อาจจะ</p></div></div>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@discord/embedded-app-sdk@2.5.0/dist/index.global.js"></script>
+  <script src="/js/app.js?v=2.2.0"></script>
+</body>
+</html>
